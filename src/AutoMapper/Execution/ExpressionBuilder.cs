@@ -7,32 +7,26 @@ using static Internal.ReflectionHelper;
 public static class ExpressionBuilder
 {
     public static readonly MethodInfo ObjectToString = typeof(object).GetMethod(nameof(object.ToString));
-    private static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
     public static readonly Expression True = Constant(true, typeof(bool));
-    public static readonly Expression Null = Constant(null, typeof(object));
+    public static readonly Expression Null = Expression.Default(typeof(object));
     public static readonly Expression Empty = Empty();
-    public static readonly LambdaExpression EmptyLambda = Expression.Lambda(Empty);
-    public static readonly Expression Zero = Constant(0, typeof(int));
+    public static readonly Expression Zero = Expression.Default(typeof(int));
     public static readonly ParameterExpression ExceptionParameter = Parameter(typeof(Exception), "ex");
     public static readonly ParameterExpression ContextParameter = Parameter(typeof(ResolutionContext), "context");
     public static readonly MethodInfo IListClear = typeof(IList).GetMethod(nameof(IList.Clear));
-    public static readonly MethodInfo IListAdd = typeof(IList).GetMethod(nameof(IList.Add));
-    public static readonly MethodInfo IncTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.IncrementTypeDepth));
-    public static readonly MethodInfo DecTypeDepthInfo = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.DecrementTypeDepth));
-    private static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CreateInstance));
-    public static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.OverTypeDepth));
-    public static readonly MethodInfo CacheDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CacheDestination));
-    public static readonly MethodInfo GetDestinationMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.GetDestination));
-    private static readonly MethodCallExpression CheckContextCall = Expression.Call(
+    static readonly MethodInfo ContextCreate = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.CreateInstance));
+    static readonly MethodInfo OverTypeDepthMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.OverTypeDepth));
+    static readonly MethodCallExpression CheckContextCall = Expression.Call(
         typeof(ResolutionContext).GetStaticMethod(nameof(ResolutionContext.CheckContext)), ContextParameter);
-    private static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
-    private static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
-    private static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
-    private static readonly ReadOnlyCollection<ParameterExpression> DisposableArray = Disposable.ToReadOnly();
-    private static readonly Expression DisposeCall = IfThen(ReferenceNotEqual(Disposable, Null), Expression.Call(Disposable, DisposeMethod));
-    private static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
-    private static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
-    private static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
+    static readonly MethodInfo ContextMapMethod = typeof(ResolutionContext).GetInstanceMethod(nameof(ResolutionContext.MapInternal));
+    static readonly MethodInfo ArrayEmptyMethod = typeof(Array).GetStaticMethod(nameof(Array.Empty));
+    static readonly ParameterExpression Disposable = Variable(typeof(IDisposable), "disposableEnumerator");
+    static readonly ReadOnlyCollection<ParameterExpression> DisposableArray = Disposable.ToReadOnly();
+    static readonly MethodInfo DisposeMethod = typeof(IDisposable).GetMethod(nameof(IDisposable.Dispose));
+    static readonly Expression DisposeCall = IfThen(ReferenceNotEqual(Disposable, Null), Expression.Call(Disposable, DisposeMethod));
+    static readonly ParameterExpression Index = Variable(typeof(int), "sourceArrayIndex");
+    static readonly BinaryExpression ResetIndex = Assign(Index, Zero);
+    static readonly UnaryExpression IncrementIndex = PostIncrementAssign(Index);
     public static Expression ReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression newParameter) =>
         configuration.ParameterReplaceVisitor().Replace(initialLambda, newParameter);
     public static Expression ReplaceParameters(this IGlobalConfiguration configuration, LambdaExpression initialLambda, Expression[] newParameters) =>
