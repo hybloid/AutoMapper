@@ -1,0 +1,4 @@
+bootstrap: sudo apt-get update; sudo apt-get install unzip
+
+dotnet:
+  solution: AutoMapper.sln
